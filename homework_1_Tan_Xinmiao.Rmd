@@ -28,5 +28,15 @@ country_col <- WorldCities$country
 unique(country_col)
 region_col <- WorldCities$region
 unique(region_col)
+
+WorldCities %>% select(country) %>% unique()
+
+WorldCities %>% ggplot(aes(x = population)) + 
+    geom_histogram()+
+    xlab('City Population')+
+    ylab('City Count') +
+    ggtitle('City Histogram') +
+    theme_bw()
+ 
 ```
 
