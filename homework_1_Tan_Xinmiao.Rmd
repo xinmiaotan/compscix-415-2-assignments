@@ -9,22 +9,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+My Github repository for my assignments can be found at this URL: [https://github.com/xinmiaotan/compscix-415-2-assignments](https://github.com/xinmiaotan/compscix-415-2-assignments)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r cars r load_packages, warning=FALSE, message=FALSE}
+library(mdsr) 
+library(tidyverse)
+data("WorldCities")
 ```
 
-## Including Plots
+A data frame with 23,018 observations on the following 10 variables.
+Some variable names: code, name, latitude, longitude, country, countryRegion, population, regionCode, region, date
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+glimpse(WorldCities)
+WorldCities <- head(WorldCities, 200) # 200 rows
+country_col <- WorldCities$country
+unique(country_col)
+region_col <- WorldCities$region
+unique(region_col)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
