@@ -1,0 +1,325 @@
+---
+title: "COMPSCIX 415.2 Homework 1"
+author: "Xinmiao Tan"
+date: "June 16, 2018"
+output: html_document 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+My Github repository for my assignments can be found at this URL: [https://github.com/xinmiaotan/compscix-415-2-assignments](https://github.com/xinmiaotan/compscix-415-2-assignments)
+
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(ggplot2)
+```
+
+##Section 3.2.4: all exercises
+### 1. Run ggplot(data = mpg). What do you see?
+
+```{r}
+data(mpg)
+ggplot(data = mpg)
+```
+
+There is no plot shown, since we did not assign x and y variables.  
+
+### 2. How many rows are in mpg? How many columns?
+
+```{r}
+nrow(mpg)
+ncol(mpg)
+```
+
+There are 234 rows and 11 columns
+
+### 3. What does the drv variable describe? Read the help for ?mpg to find out.
+
+```{r}
+?mpg
+```
+
+f = front-wheel drive, r = rear wheel drive, 4 = 4wd
+
+### 4. Make a scatterplot of hwy vs cyl.
+
+```{r}
+ggplot(data=mpg, aes(x=hwy , y=cyl)) + geom_point()
+```
+
+### 5. What happens if you make a scatterplot of class vs drv? Why is the plot not useful?
+
+```{r}
+ggplot(data=mpg, aes(x=class , y=cyl)) + geom_point()
+```
+
+class is categorical data, it has no meaning in the X
+
+## Section 3.3.1: all exercises
+
+### 1. What’s gone wrong with this code? Why are the points not blue?
+
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+```
+
+Color should not be mapped, should use the following code.
+
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+```
+
+### 2. Which variables in mpg are categorical? Which variables are continuous? (Hint: type ?mpg to read the documentation for the dataset). How can you see this information when you run mpg?
+
+```{r}
+?mpg
+summary(mpg)
+```
+
+Categorical variables: manufacturer, model, trans, drv, fl, class.
+Continuous variables: displ, year, cyl, cty, hwy.
+This information helps to select what type of graph to use to visualize the data, histogram, bars, points or lines
+
+### 3. Map a continuous variable to color, size, and shape. How do these aesthetics behave differently for categorical vs. continuous variables?
+
+```{r}
+#continuous
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = cyl))
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, size = cyl))
+#ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, shape = cyl))
+#categorical
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = class))
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, size = class))
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+```
+
+Color:
+Use the darkness of the color to identify the changes of continous variables.
+Use different colors to represent different category of the categorical variables.
+Size:
+Use the size change to identify the changes of continous variables. This is advised.
+Use the size change to represent different category of the categorical variable. This is not advised.
+Shape:
+A continuous variable can not be mapped to shape.
+Use different shape to represent different category of the categorical variables.
+
+### 4. What happens if you map the same variable to multiple aesthetics?
+
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = class, shape = class))
+```
+
+That variable has multiple aethetics appeared.
+
+### 5. What does the stroke aesthetic do? What shapes does it work with? (Hint: use ?geom_point)
+
+```{r}
+?geom_point
+```
+
+For shapes that have a border (like 21), you can colour the inside and outside separately. Use the stroke aesthetic to modify the width of the border.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+    geom_point(shape = 21, colour = "black", fill = "white", size = 2, stroke = 1)
+```
+
+### 6. What happens if you map an aesthetic to something other than a variable name, like aes(colour = displ < 5)?
+
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = displ < 5))
+```
+
+It will categorize that variable into following the logic or not follow the logic, such as displ<5 and displ>=5.
+
+## Section 3.5.1: #4 and #5 only
+### 4. Take the first faceted plot in this section. What are the advantages to using faceting instead of the colour aesthetic? What are the disadvantages? How might the balance change if you had a larger dataset?
+
+```{r}
+ggplot(data = mpg) + 
+    geom_point(mapping = aes(x = displ, y = hwy)) + 
+    facet_wrap(~ class, nrow = 2)
+```
+
+Advantages: It shows the correlation between x and y by different classes, it is more intuitive.
+We can compare across panels.
+Disadvantage: It dose not show the correlation between x and y regardless the impact of the facet_wrap variable.
+
+### 5. Read ?facet_wrap.   
+
+```{r}
+?facet_wrap
+```
+
+###What does nrow do? What does ncol do?
+nrow, ncol	address the Number of rows and columns for the panel.
+
+###What other options control the layout of the individual panels? 
+scales: should Scales be fixed ("fixed", the default), free ("free"), or free in one dimension ("free_x", "free_y"). By default, the same scales are used for all panels. You can allow scales to vary across the panels with the `scales` argument. Free scales make it easier to see patterns within each panel, but harder to compare across panels. Example:
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+    geom_point() +
+    facet_wrap(~class, scales = "free")
+```
+
+shrink: if TRUE, will shrink scales to fit output of statistics, not raw data. If FALSE, will be range of raw data before statistical summary.
+
+labeller: A function that takes one data frame of labels and returns a list or data frame of character vectors. Example:
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+    geom_point() +
+    facet_wrap(c("cyl", "drv"), labeller = "label_both")
+```
+
+To change the order in which the panels appear, change the levels of the underlying factor. Example:
+
+```{r}
+mpg$class2 <- reorder(mpg$class, mpg$displ)
+ggplot(mpg, aes(displ, hwy)) +
+    geom_point() +
+    facet_wrap(~class2)
+```
+
+as.table: If TRUE, the default, the facets are laid out like a table with highest values at the bottom-right. If FALSE, the facets are laid out like a plot with the highest value at the top-right.
+
+switch: If "x", the top labels will be displayed to the bottom. If "y", the right-hand side labels will be displayed to the left. Can also be set to "both"
+
+drop:f TRUE, the default, all factor levels not used in the data will automatically be dropped. If FALSE, all factor levels will be shown, regardless of whether or not they appear in the data
+
+dir:Direction: either "h" for horizontal, the default, or "v", for vertical.
+
+strip.position: By default, the labels are displayed on the top of the plot. Using strip.position it is possible to place the labels on either of the four sides by setting strip.position = c("top", "bottom", "left", "right") Use `strip.position` to display the facet labels at the side of your choice. Setting it to `bottom` makes it act as a subtitle for the axis. This is typically used with free scales and a theme without boxes around strip labels.Example:
+
+```{r}
+ggplot(economics_long, aes(date, value)) +
+    geom_line() +
+    facet_wrap(~variable, scales = "free_y", nrow = 2, strip.position = "bottom") +
+    theme(strip.background = element_blank(), strip.placement = "outside")
+```
+
+To repeat the same data in every panel, simply construct a data frame that does not contain the facetting variable.
+
+### Why doesn’t facet_grid() have nrow and ncol argument?
+
+Because it will make the variables value in the facet_grid to be the x and y of the panel. Example:
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+    geom_point(data = transform(mpg, class = NULL), colour = "grey85") +
+    geom_point() +
+    facet_wrap(~class)
+ggplot(data = mpg) + 
+    geom_point(mapping = aes(x = displ, y = hwy)) + 
+    facet_grid(drv ~ cyl)
+```
+
+## Section 3.6.1: #1-5. Extra Credit: Do #6 
+### 1. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
+
+```{r}
+# line
+ggplot(data = mpg, aes(x = displ, y = hwy)) + 
+    geom_line()
+ggplot(data = mpg, aes(x = displ, y = hwy)) + 
+    geom_smooth()
+# boxplot
+ggplot(data = mpg, aes(x = class, y = hwy)) + 
+    geom_boxplot()
+# histogram
+ggplot(data = mpg, aes(x = displ)) + 
+    geom_histogram(binwidth = 0.2) 
+```
+
+### 2. Run this code in your head and predict what the output will look like. Then, run the code in R and check your predictions.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+    geom_point() + 
+    geom_smooth(se = FALSE)
+```
+
+### 3. What does show.legend = FALSE do? What happens if you remove it? Why do you think I used it earlier in the chapter?
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+    geom_point() + 
+    geom_smooth(show.legend = FALSE, se = FALSE)
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+    geom_point() + 
+    geom_smooth(se = FALSE)
+```
+
+show.legend = FALSE did not show the legend. If remove show.legend = FALSE, lengend will be shown. In the earilier chapter, we want to show the lengend to indicate the label.
+
+### 4. What does the se argument to geom_smooth() do?
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+    geom_point() + 
+    geom_smooth()
+```
+
+se = FALSE exclude the display confidence interval around smooth
+    
+### 5. Will these two graphs look different? Why/why not?
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_point() + 
+    geom_smooth()
+ggplot() + 
+    geom_point(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_smooth(data = mpg, mapping = aes(x = displ, y = hwy))
+```
+
+Same, they are mapping the same variables
+
+### 6. Recreate the R code necessary to generate the following graphs.
+
+```{r}
+#fig1
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_point() + 
+    geom_smooth(se=FALSE)
+#fig2
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_point() + 
+    geom_smooth(mapping = aes(group=drv), se=FALSE)
+#fig3
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color=drv)) + 
+    geom_point() + 
+    geom_smooth(mapping = aes(group=drv), se=FALSE)
+#fig4
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_point(mapping=aes(color= drv)) + 
+    geom_smooth(se=FALSE)
+#fig5 
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, group = drv)) + 
+    geom_point(mapping=aes(color = drv)) + 
+    geom_smooth(mapping=aes(linetype = drv), se=FALSE)
+#fig6
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_point(mapping = aes(fill = drv),  color="white", size =2, stroke=2, shape = 21) 
+```
+
+##Section 3.7.1: #2 only
+### 2. What does geom_col() do? How is it different to geom_bar()?
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+    geom_col()
+ggplot(data = mpg, mapping = aes(x = displ)) + 
+    geom_bar()
+```
+
+geom_col: heights of the bars to represent values in the data,
+geom_bar: makes the height of the bar proportional to the number of cases in each group 
+
+## Answer these questions: 
+###1. Look at the data graphics at the following link: What is a Data Scientist. Please briefly critique the designer’s choices. What works? What doesn’t work? What would you have done differently?
+
+Data scientist is someone who combine with new tools for analyzing the data. People who are capable of translating the trove of data created by mobile sensors, social media, surveillance, medical imaging, smart grids and the like - into predictive insights that lead to business value. Data scientists are comfortable operating with incomplete data. Data scientists are more likely to be involved across the data lifecycle: acquiring new data sets, parsing data sets, filtering and organizing data set , advanced algorithms to solve analytical problems, representing data visually, telling a story with data, interacting with data dynamically. 
