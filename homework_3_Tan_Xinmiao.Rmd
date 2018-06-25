@@ -1,0 +1,220 @@
+---
+title: "COMPSCIX 415.2 Homework 3"
+author: "Xinmiao Tan"
+date: "June 25, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+My Github repository for my assignments can be found at this URL: [https://github.com/xinmiaotan/compscix-415-2-assignments](https://github.com/xinmiaotan/compscix-415-2-assignments)
+
+```{r load_packages, warning=FALSE, message=FALSE}
+library(nycflights13)
+library(ggplot2)
+library(tidyverse)
+```
+
+##Section 3.8.1: all exercises
+
+### 1. What is the problem with this plot? How could you improve it?
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+    geom_point()
+```
+
+X label and Y label should be rename to be more intuitive. Additoanl smother line can be added to display the relation between hwy and cty. Position = "jitter" can be added to geom_point() to handle overplotting caused by discreteness in smaller datasets
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+    geom_point(position = "jitter") +
+    xlab('number of cylinders') +
+    ylab('highway miles per gallon') +
+    geom_smooth()
+```
+
+### 2. What parameters to geom_jitter() control the amount of jittering?
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+    geom_point() +
+    geom_jitter()
+```
+
+The jitter geom is a convenient shortcut for geom_point(position = "jitter"). It adds a small amount of random variation to the location of each point, and is a useful way of handling overplotting caused by discreteness in smaller datasets.
+Position: Position adjustment, either as a string, or the result of a call to a position adjustment function.
+
+Width: Amount of vertical and horizontal jitter. The jitter is added in both positive and negative directions, so the total spread is twice the value specified here.
+If omitted, defaults to 40% of the resolution of the data: this means the jitter values will occupy 80% of the implied bins. Categorical data is aligned on the integers, so a width or height of 0.5 will spread the data so it's not possible to see the distinction between the categories.
+
+Height: Amount of vertical and horizontal jitter. The jitter is added in both positive and negative directions, so the total spread is twice the value specified here.
+If omitted, defaults to 40% of the resolution of the data: this means the jitter values will occupy 80% of the implied bins. Categorical data is aligned on the integers, so a width or height of 0.5 will spread the data so it's not possible to see the distinction between the categories.
+
+```{r}
+ggplot(mpg, aes(cty, hwy)) + geom_jitter()
+ggplot(mpg, aes(cty, hwy)) + geom_jitter(width = 0.5, height = 0.5)
+```
+
+### 3. Compare and contrast geom_jitter() with geom_count().
+
+```{r}
+ggplot(mpg, aes(cty, hwy)) + geom_jitter()
+ggplot(mpg, aes(cty, hwy)) + geom_count()
+```
+
+geom_count(): This is a variant geom_point that counts the number of observations at each location, then maps the count to point area. It useful when you have discrete data and overplotting.
+
+geom_jitter(): It adds a small amount of random variation to the location of each point, and is a useful way of handling overplotting caused by discreteness in smaller datasets.
+
+### 4. What’s the default position adjustment for geom_boxplot()? Create a visualisation of the mpg dataset that demonstrates it.
+
+```{r}
+ggplot(mpg, aes(class, hwy)) + geom_boxplot()
+ggplot(mpg, aes(class, hwy)) + geom_boxplot(position = "dodge") 
+```
+
+The default is dodge, the points are moved to the side by a discrete amount
+
+##Section 3.9.1: #2 and #4 only
+
+### 2. What does labs() do? Read the documentation.
+
+Good labels are critical for making your plots accessible to a wider audience. Ensure the axis and legend labels display the full variable name. Use the plot title and subtitle to explain the main findings. It's common to use the caption to provide information about the data source.
+
+```{r}
+p <- ggplot(mtcars, aes(mpg, wt, colour = cyl)) + geom_point()
+p + labs(colour = "Cylinders")
+p + labs(x = "New x label")
+```
+
+### 4. What does the plot below tell you about the relationship between city and highway mpg? Why is coord_fixed() important? What does geom_abline() do?
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+    geom_point() + 
+    geom_abline() +
+    coord_fixed()
+```
+
+As the number of cty increase, the number of hwy also increasse. The number of HWY is alway bigger than the corresponding cty.
+
+A fixed scale coordinate system forces a specified ratio between the physical representation of data units on the axes. The ratio represents the number of units on the y-axis equivalent to one unit on the x-axis. The default, ratio = 1, ensures that one unit on the x-axis is the same length as one unit on the y-axis. 
+
+These geoms add reference lines (sometimes called rules) to a plot, either horizontal, vertical, or diagonal (specified by slope and intercept). These are useful for annotating plots.
+
+##Section 4.4: #1 and #2 only
+
+### 1. Why does this code not work? Look carefully! (This may seem like an exercise in pointlessness, but training your brain to notice even the tiniest difference will pay off when programming.)
+
+```{r}
+my_variable <- 10
+my_variable
+```
+
+There is a typo in my_varıable, should be my_variable.
+
+### 2. Tweak each of the following R commands so that they run correctly:
+
+```{r}
+ggplot(data = mpg) + 
+    geom_point(mapping = aes(x = displ, y = hwy)) 
+
+filter(mpg, cyl == 8)
+filter(diamonds, carat > 3)
+```
+
+##Section 5.2.4: #1, #3 and #4 only. You will need to install the nycflights13 package and use the flights data.
+
+### 1. Find all flights that
+
+#### 1.1 Had an arrival delay of two or more hours
+```{r}
+data(flights)
+head(flights)
+flights_sml <- select(flights, 
+                      year:day, 
+                      ends_with("delay"), 
+                      distance, 
+                      air_time,
+                      dest,
+                      carrier,
+                      dep_time,
+                      arr_time
+)
+filter(flights_sml, arr_delay >=120)
+```
+
+#### 1.2 Flew to Houston (IAH or HOU)
+
+```{r}
+filter(flights_sml, dest == 'IAH' |  dest == 'HOU')
+```
+
+#### 1.3 Were operated by United, American, or Delta
+
+```{r}
+filter(flights_sml, carrier == 'UA' |  carrier == 'AA' |  carrier == 'DL')
+```
+
+#### 1.4 Departed in summer (July, August, and September)
+
+```{r}
+filter(flights_sml, month == 7 |  month == 8 |  month == 9)
+```
+
+#### 1.5 Arrived more than two hours late, but didn’t leave late
+
+```{r}
+filter(flights_sml, dep_delay == 0 & arr_delay >=120 )
+```
+
+#### 1.6 Were delayed by at least an hour, but made up over 30 minutes in flight
+
+```{r}
+filter(flights_sml, dep_delay >= 60 & arr_delay <30 )
+```
+
+#### 1.7 Departed between midnight and 6am (inclusive)
+
+```{r}
+filter(flights_sml, dep_time >= 0 & dep_time <=600 )
+```
+
+## 3.How many flights have a missing dep_time? What other variables are missing? What might these rows represent?
+
+```{r}
+summary(flights_sml$dep_time)
+filter(flights_sml, is.na(dep_time))
+```
+
+8255 flights have a missing dep-time. dep_delay, arr_delay and arr_time are all missing. 
+This flights are cancelled.
+
+## 4. Why is NA ^ 0 not missing? Why is NA | TRUE not missing?  Why is FALSE & NA not missing?  Can you figure out the general rule? (NA * 0 is a tricky counterexample!)
+
+NA ^ 0 is 1. (Any number) ^ 0 is equal to 1. 
+NA | TRUE is NA or TRUE. This will return as TRUE.
+FALSE & NA is FALSE and NA. This will return to FALSE.
+The general rule is that whenever there is a logical expressions, if one can be tested, then the result is not NA. And any operation that the results is determined, regardless of the number, the inputting NA does not affect the result.
+
+##Section 5.4.1: #1 and #3 only
+
+### 1. Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay from flights.
+```{r}
+flights_541 <- select(flights, dep_time, dep_delay, arr_time, arr_delay)
+flights_541
+
+flights_541 <- select(flights, starts_with('dep'), starts_with('arr'))
+flights_541
+```
+
+### 3. What does the one_of() function do?  Why might it be helpful in conjunction with this vector?
+
+```{r}
+vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+select(flights, one_of(vars))
+```
+
+one_of() select variables in character vector.
